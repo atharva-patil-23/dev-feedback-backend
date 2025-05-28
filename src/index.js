@@ -1,9 +1,13 @@
-import express from "express"
+import { app } from "./app.js";
+import dotenv from "dotenv";
+import connect_db from "./database/db.js";
 
-const app = express()
+
+dotenv.config({
+    path:"./.env"
+})
+
 const PORT = process.env.PORT || 8000;
-
-app.use(express.json())
 
 let feedbacks = []
 let nextId = 1
@@ -29,6 +33,12 @@ app.get("/feedback/:id",(req,res) => {
     return res.status(202).send(comment)
 })
 
-app.listen(PORT,() => {
-    console.log(`server is listening at ${PORT}`)
-} )
+connect_db()
+.then(() => {
+    app.listen(PORT ,() => {
+        console.log(`server is listening at ${PORT}`)
+    })
+})
+.catch((err) => {
+    console.log("MongoDB connection error",err)
+})
